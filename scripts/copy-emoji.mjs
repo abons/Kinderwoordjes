@@ -10,14 +10,10 @@ const root = new URL("..", import.meta.url).pathname;
 const ctx = { self: {} };
 vm.runInNewContext(readFileSync(join(root, "words.js"), "utf8"), ctx);
 const codes = new Set(ctx.self.CATEGORIES.flatMap((c) => [c.img, ...c.woorden.map((w) => w[1])]));
+const missing = [...codes].filter((code) => !existsSync(join(src, code + ".svg")));
+if (missing.length) { console.error("ontbreekt:", missing.join(" ")); process.exit(1); } // eerst checken, dan pas img/ leegmaken
 const out = join(root, "img");
 mkdirSync(out, { recursive: true });
 for (const f of readdirSync(out)) rmSync(join(out, f));
-const missing = [];
-for (const code of codes) {
-  const from = join(src, code + ".svg");
-  if (existsSync(from)) copyFileSync(from, join(out, code + ".svg"));
-  else missing.push(code);
-}
-if (missing.length) { console.error("ontbreekt:", missing.join(" ")); process.exit(1); }
+for (const code of codes) copyFileSync(join(src, code + ".svg"), join(out, code + ".svg"));
 console.log(codes.size, "plaatjes gekopieerd");

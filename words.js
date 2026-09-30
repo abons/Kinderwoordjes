@@ -11,7 +11,7 @@ self.CATEGORIES = [
   ] },
   { id: "eten", naam: "Eten", img: "1f34e", kleur: "#e57373", woorden: [
     ["appel", "1f34e"], ["banaan", "1f34c"], ["peer", "1f350"], ["aardbei", "1f353"], ["druiven", "1f347"],
-    ["sinaasappel", "1f34a"], ["kers", "1f352"], ["citroen", "1f34b"], ["watermeloen", "1f349"],
+    ["sinaasappel", "1f34a"], ["kersen", "1f352"], ["citroen", "1f34b"], ["watermeloen", "1f349"],
     ["tomaat", "1f345"], ["wortel", "1f955"], ["komkommer", "1f952"], ["brood", "1f35e"], ["kaas", "1f9c0"],
     ["ei", "1f95a"], ["melk", "1f95b"], ["koekje", "1f36a"], ["taart", "1f370"], ["ijsje", "1f366"],
     ["pizza", "1f355"],
@@ -28,20 +28,20 @@ self.CATEGORIES = [
   ] },
   { id: "kleding", naam: "Kleren", img: "1f455", kleur: "#ba68c8", woorden: [
     ["shirt", "1f455"], ["broek", "1f456"], ["jurk", "1f457"], ["sokken", "1f9e6"], ["schoen", "1f45f"],
-    ["laars", "1f462"], ["jas", "1f9e5"], ["pet", "1f9e2"], ["sjaal", "1f9e3"], ["wanten", "1f9e4"],
+    ["laars", "1f462"], ["jas", "1f9e5"], ["pet", "1f9e2"], ["sjaal", "1f9e3"], ["handschoenen", "1f9e4"],
     ["bril", "1f453"], ["hoed", "1f3a9"],
   ] },
   { id: "buiten", naam: "Buiten", img: "1f333", kleur: "#81c784", woorden: [
     ["zon", "2600"], ["maan", "1f319"], ["ster", "2b50"], ["wolk", "2601"], ["regen", "1f327"],
     ["regenboog", "1f308"], ["bloem", "1f337"], ["boom", "1f333"], ["blad", "1f343"],
-    ["paddenstoel", "1f344"], ["sneeuwpop", "26c4"], ["zee", "1f30a"], ["berg", "26f0"],
+    ["paddenstoel", "1f344"], ["sneeuwpop", "26c4"], ["golf", "1f30a"], ["berg", "26f0"],
   ] },
   { id: "speelgoed", naam: "Speelgoed", img: "1f9f8", kleur: "#4db6ac", woorden: [
     ["bal", "26bd"], ["ballon", "1f388"], ["knuffel", "1f9f8"], ["vlieger", "1fa81"], ["jojo", "1fa80"],
-    ["trommel", "1f941"], ["gitaar", "1f3b8"], ["puzzel", "1f9e9"], ["cadeau", "1f381"], ["blokken", "1f9f1"],
+    ["trommel", "1f941"], ["gitaar", "1f3b8"], ["puzzel", "1f9e9"], ["cadeau", "1f381"],
   ] },
   { id: "thuis", naam: "Thuis", img: "1f3e0", kleur: "#ffd54f", woorden: [
-    ["huis", "1f3e0"], ["bed", "1f6cf"], ["stoel", "1fa91"], ["deur", "1f6aa"], ["lamp", "1f4a1"],
+    ["huis", "1f3e0"], ["bed", "1f6cf"], ["stoel", "1fa91"], ["deur", "1f6aa"], ["lampje", "1f4a1"],
     ["klok", "23f0"], ["boek", "1f4d6"], ["telefoon", "1f4f1"], ["tandenborstel", "1faa5"], ["zeep", "1f9fc"],
     ["bad", "1f6c1"], ["wc", "1f6bd"], ["sleutel", "1f511"], ["lepel", "1f944"], ["kopje", "2615"],
     ["tv", "1f4fa"],
