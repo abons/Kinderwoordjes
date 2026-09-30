@@ -9,12 +9,22 @@ self.CATEGORIES = [
     ["muis", "1f401"], ["giraf", "1f992"], ["zebra", "1f993"], ["uil", "1f989"], ["vlinder", "1f98b"],
     ["slak", "1f40c"], ["kikker", "1f438"], ["schildpad", "1f422"], ["pinguïn", "1f427"],
   ] },
-  { id: "eten", naam: "Eten", img: "1f34e", kleur: "#e57373", woorden: [
+  { id: "fruit", naam: "Fruit", img: "1f34e", kleur: "#e57373", woorden: [
     ["appel", "1f34e"], ["banaan", "1f34c"], ["peer", "1f350"], ["aardbei", "1f353"], ["druiven", "1f347"],
     ["sinaasappel", "1f34a"], ["kersen", "1f352"], ["citroen", "1f34b"], ["watermeloen", "1f349"],
-    ["tomaat", "1f345"], ["wortel", "1f955"], ["komkommer", "1f952"], ["brood", "1f35e"], ["kaas", "1f9c0"],
-    ["ei", "1f95a"], ["melk", "1f95b"], ["koekje", "1f36a"], ["taart", "1f370"], ["ijsje", "1f366"],
-    ["pizza", "1f355"],
+    ["meloen", "1f348"], ["ananas", "1f34d"], ["perzik", "1f351"], ["kiwi", "1f95d"], ["mango", "1f96d"],
+    ["bosbessen", "1fad0"], ["kokosnoot", "1f965"],
+  ] },
+  { id: "groente", naam: "Groente", img: "1f955", kleur: "#aed581", woorden: [
+    ["wortel", "1f955"], ["tomaat", "1f345"], ["komkommer", "1f952"], ["broccoli", "1f966"], ["maïs", "1f33d"],
+    ["paprika", "1fad1"], ["aardappel", "1f954"], ["ui", "1f9c5"], ["knoflook", "1f9c4"], ["erwten", "1fadb"],
+    ["sla", "1f96c"], ["aubergine", "1f346"],
+  ] },
+  { id: "eten", naam: "Eten", img: "1f35e", kleur: "#ffab91", woorden: [
+    ["brood", "1f35e"], ["kaas", "1f9c0"], ["ei", "1f95a"], ["melk", "1f95b"], ["koekje", "1f36a"],
+    ["taart", "1f370"], ["ijsje", "1f366"], ["pizza", "1f355"], ["pannenkoek", "1f95e"], ["patat", "1f35f"],
+    ["hamburger", "1f354"], ["snoepje", "1f36c"], ["lolly", "1f36d"], ["chocola", "1f36b"], ["soep", "1f372"],
+    ["sap", "1f9c3"],
   ] },
   { id: "vervoer", naam: "Vervoer", img: "1f697", kleur: "#64b5f6", woorden: [
     ["auto", "1f697"], ["bus", "1f68c"], ["trein", "1f682"], ["vliegtuig", "2708"], ["boot", "26f5"],
@@ -45,5 +55,30 @@ self.CATEGORIES = [
     ["klok", "23f0"], ["boek", "1f4d6"], ["telefoon", "1f4f1"], ["tandenborstel", "1faa5"], ["zeep", "1f9fc"],
     ["bad", "1f6c1"], ["wc", "1f6bd"], ["sleutel", "1f511"], ["lepel", "1f944"], ["kopje", "2615"],
     ["tv", "1f4fa"],
+  ] },
+  { id: "zee", naam: "In de zee", img: "1f433", kleur: "#4fc3f7", woorden: [
+    ["walvis", "1f433"], ["dolfijn", "1f42c"], ["haai", "1f988"], ["krab", "1f980"], ["octopus", "1f419"],
+    ["kwal", "1fabc"], ["schelp", "1f41a"], ["zeehond", "1f9ad"], ["garnaal", "1f990"], ["kogelvis", "1f421"],
+  ] },
+  { id: "beestjes", naam: "Beestjes", img: "1f41e", kleur: "#dce775", woorden: [
+    ["bij", "1f41d"], ["lieveheersbeestje", "1f41e"], ["mier", "1f41c"], ["rups", "1f41b"], ["spin", "1f577"],
+    ["worm", "1fab1"], ["kever", "1fab2"], ["vlieg", "1fab0"], ["mug", "1f99f"], ["sprinkhaan", "1f997"],
+  ] },
+  { id: "bos", naam: "In het bos", img: "1f98a", kleur: "#a1887f", woorden: [
+    ["vos", "1f98a"], ["hert", "1f98c"], ["eekhoorn", "1f43f"], ["egel", "1f994"], ["wolf", "1f43a"],
+    ["das", "1f9a1"], ["wild zwijn", "1f417"], ["dennenboom", "1f332"], ["kastanje", "1f330"],
+  ] },
+  { id: "familie", naam: "Familie", img: "1f46a", kleur: "#f8bbd0", woorden: [
+    ["baby", "1f476"], ["jongen", "1f466"], ["meisje", "1f467"], ["mama", "1f469"], ["papa", "1f468"],
+    ["opa", "1f474"], ["oma", "1f475"],
+  ] },
+  { id: "kleuren", naam: "Kleuren", img: "1f3a8", kleur: "#fff59d", woorden: [
+    ["rood", "1f534"], ["blauw", "1f535"], ["geel", "1f7e1"], ["groen", "1f7e2"], ["oranje", "1f7e0"],
+    ["paars", "1f7e3"], ["bruin", "1f7e4"], ["zwart", "26ab"], ["wit", "26aa"],
+  ] },
+  // opVolgorde: niet schudden, zodat je kunt meetellen
+  { id: "getallen", naam: "Tellen", img: "33-20e3", kleur: "#90caf9", opVolgorde: true, woorden: [
+    ["één", "31-20e3"], ["twee", "32-20e3"], ["drie", "33-20e3"], ["vier", "34-20e3"], ["vijf", "35-20e3"],
+    ["zes", "36-20e3"], ["zeven", "37-20e3"], ["acht", "38-20e3"], ["negen", "39-20e3"], ["tien", "1f51f"],
   ] },
 ];

@@ -32,7 +32,7 @@ function zeg(tekst) {
 
 const schud = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
-let rij = [], pos = 0, laatste = 0, terugBezig = false;
+let huidig = null, rij = [], pos = 0, laatste = 0, terugBezig = false;
 function toon() {
   const [w, img] = rij[pos];
   plaatje.src = "img/" + img + ".svg";
@@ -45,6 +45,8 @@ function volgende() {
   if (nu - laatste < 400) return; // wild tikken van kleine handjes niet laten doorrazen
   laatste = nu;
   if (++pos >= rij.length) {
+    pos = 0;
+    if (huidig.opVolgorde) return toon();
     const vorige = rij[rij.length - 1];
     rij = schud(rij);
     if (rij.length > 1 && rij[0] === vorige) rij.push(rij.shift()); // niet twee keer hetzelfde achter elkaar
@@ -54,7 +56,7 @@ function volgende() {
 }
 function start(cat) {
   if (kaart.classList.contains("on")) return; // twee vingers op twee tegels: maar één keer pushState
-  rij = schud(cat.woorden); pos = 0; laatste = Date.now();
+  huidig = cat; rij = cat.opVolgorde ? cat.woorden : schud(cat.woorden); pos = 0; laatste = Date.now();
   home.classList.remove("on"); kaart.classList.add("on");
   history.pushState({ kaart: true }, "");
   toon();
