@@ -1,9 +1,10 @@
 # Kinderwoordjes
 
 Een PWA voor peuters (±3 jaar) om eerste Nederlandse woordjes te leren. Kies een categorie, je ziet
-een groot plaatje met het woord eronder (en het toestel leest het voor). Tik ergens op het scherm
-voor het volgende woord. Eén knop (het huisje) brengt je terug naar de categorieën, net als de
-terugknop van Android.
+een groot plaatje met het woord eronder. De eerste tik laat het toestel het woord voorlezen, de
+tweede tik gaat naar het volgende woord. Staat het geluid uit, of kan het toestel geen Nederlands
+praten, dan gaat één tik meteen verder. Eén knop (het huisje) brengt je terug naar de categorieën,
+net als de terugknop van Android.
 
 Net zo licht als de zusterapps: gewone HTML + JavaScript, **geen framework, geen build-stap en geen
 runtime-afhankelijkheden**. Na het eerste bezoek werkt alles offline, want de service worker zet de
@@ -12,7 +13,8 @@ hele app en alle plaatjes in de cache. Installeren als app kan via "Toevoegen aa
 ## Bestanden
 
 - `index.html`: de opmaak en de styling (inline).
-- `app.js`: de schermen, de volgorde (geschud, zonder hetzelfde woord twee keer achter elkaar), het
+- `app.js`: de schermen, de volgorde (geschud, zonder hetzelfde woord twee keer achter elkaar,
+  behalve bij `opVolgorde`), eerst kijken en dan horen (tik 1 zegt, tik 2 gaat verder), het
   voorlezen (Web Speech API, `nl-NL`, met een aan/uit-knop op het beginscherm) en een korte
   tik-drempel zodat wild tikken niet door de woorden raast.
 - `words.js`: alle categorieën en woorden. `sw.js` leest dit bestand ook in, om alle plaatjes
