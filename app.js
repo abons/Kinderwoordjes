@@ -116,4 +116,22 @@ for (const cat of self.CATEGORIES) {
   cats.append(b);
 }
 
+// Installeren als app: Chrome/Edge geven een eigen prompt (beforeinstallprompt), iOS niet, daar leggen we het uit.
+const installeer = $("installeer");
+const alsApp = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+let installPrompt = null;
+if (!alsApp && iOS) installeer.hidden = false;
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installPrompt = e; installeer.hidden = false; });
+window.addEventListener("appinstalled", () => { installeer.hidden = true; installPrompt = null; });
+installeer.onclick = async () => {
+  if (installPrompt) {
+    installPrompt.prompt();
+    if ((await installPrompt.userChoice).outcome === "accepted") installeer.hidden = true;
+    installPrompt = null;
+  } else {
+    alert("Zet Woordjes op je beginscherm:\ntik onderin op Delen (vierkantje met pijltje) en kies \"Zet op beginscherm\".");
+  }
+};
+
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js", { updateViaCache: "none" });

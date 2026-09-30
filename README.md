@@ -1,5 +1,7 @@
 # Kinderwoordjes
 
+**▶ Open de app: <https://abons.github.io/Kinderwoordjes/>**
+
 Een PWA voor peuters (±3 jaar) om eerste Nederlandse woordjes te leren. Kies een categorie, je ziet
 een groot plaatje met het woord eronder. De eerste tik laat het toestel het woord voorlezen, de
 tweede tik gaat naar het volgende woord. Staat het geluid uit, of kan het toestel geen Nederlands
@@ -8,7 +10,20 @@ net als de terugknop van Android.
 
 Net zo licht als de zusterapps: gewone HTML + JavaScript, **geen framework, geen build-stap en geen
 runtime-afhankelijkheden**. Na het eerste bezoek werkt alles offline, want de service worker zet de
-hele app en alle plaatjes in de cache. Installeren als app kan via "Toevoegen aan startscherm".
+hele app en alle plaatjes in de cache.
+
+## Installeren als app (PWA)
+
+Open **<https://abons.github.io/Kinderwoordjes/>** op de telefoon of tablet, en dan:
+
+- **Android (Chrome):** tik op de knop **📲 Installeren** op het beginscherm van de app, of kies in
+  het menu ⋮ **App installeren** / **Toevoegen aan startscherm**.
+- **iPhone / iPad (Safari):** tik op **Delen** (het vierkantje met pijltje) en kies **Zet op
+  beginscherm**. De knop 📲 in de app legt dit ook uit.
+- **Computer (Chrome/Edge):** klik op het installeer-icoon rechts in de adresbalk, of op 📲.
+
+Daarna opent de app schermvullend vanaf het startscherm en werkt hij ook zonder internet. Is de app
+al geïnstalleerd, dan is de knop 📲 weg.
 
 ## Bestanden
 
