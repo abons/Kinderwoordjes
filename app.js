@@ -124,13 +124,20 @@ let installPrompt = null;
 if (!alsApp && iOS) installeer.hidden = false;
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installPrompt = e; installeer.hidden = false; });
 window.addEventListener("appinstalled", () => { installeer.hidden = true; installPrompt = null; });
+// In-app browsers (WhatsApp, Instagram, Facebook, Gmail…) kunnen niet op het beginscherm zetten: eerst naar Safari.
+const inApp = /FBAN|FBAV|Instagram|Line\/|WhatsApp|GSA\/|Snapchat|LinkedInApp/.test(navigator.userAgent);
 installeer.onclick = async () => {
   if (installPrompt) {
-    installPrompt.prompt();
-    if ((await installPrompt.userChoice).outcome === "accepted") installeer.hidden = true;
+    // prompt() mag maar één keer per event, en Chrome vuurt pas bij een volgende paginalading een nieuwe
+    const p = installPrompt;
     installPrompt = null;
-  } else {
-    alert("Zet Woordjes op je beginscherm:\ntik onderin op Delen (vierkantje met pijltje) en kies \"Zet op beginscherm\".");
+    installeer.hidden = true;
+    p.prompt();
+    await p.userChoice.catch(() => {});
+  } else if (iOS) {
+    alert(inApp
+      ? "Open deze pagina eerst in Safari. Tik daar op Delen (vierkantje met pijltje) en kies \"Zet op beginscherm\"."
+      : "Zet Woordjes op je beginscherm: tik op Delen (vierkantje met pijltje, soms onder •••) en kies \"Zet op beginscherm\".");
   }
 };
 

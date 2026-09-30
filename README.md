@@ -16,14 +16,15 @@ hele app en alle plaatjes in de cache.
 
 Open **<https://abons.github.io/Kinderwoordjes/>** op de telefoon of tablet, en dan:
 
-- **Android (Chrome):** tik op de knop **📲 Installeren** op het beginscherm van de app, of kies in
-  het menu ⋮ **App installeren** / **Toevoegen aan startscherm**.
-- **iPhone / iPad (Safari):** tik op **Delen** (het vierkantje met pijltje) en kies **Zet op
-  beginscherm**. De knop 📲 in de app legt dit ook uit.
+- **Android (Chrome):** kies in het menu ⋮ **App installeren** / **Toevoegen aan startscherm**. Als
+  Chrome het aanbiedt, staat er ook een knop **📲** op het beginscherm van de app.
+- **iPhone / iPad:** tik op **Delen** (het vierkantje met pijltje, soms onder **•••**) en kies
+  **Zet op beginscherm**. De knop 📲 in de app legt dit ook uit. Geopend vanuit WhatsApp, Instagram
+  of een andere app? Open de link dan eerst in Safari.
 - **Computer (Chrome/Edge):** klik op het installeer-icoon rechts in de adresbalk, of op 📲.
 
-Daarna opent de app schermvullend vanaf het startscherm en werkt hij ook zonder internet. Is de app
-al geïnstalleerd, dan is de knop 📲 weg.
+Daarna opent de app schermvullend vanaf het startscherm en werkt hij ook zonder internet. In de
+geïnstalleerde app is de knop 📲 weg.
 
 ## Bestanden
 
