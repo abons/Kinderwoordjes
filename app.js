@@ -21,31 +21,48 @@ function kiesStem() {
 }
 if (window.speechSynthesis) { kiesStem(); speechSynthesis.onvoiceschanged = kiesStem; }
 // spraakKapot: er is wel speechSynthesis, maar er komt niets uit (geen stemmen, fout). Dan gaat één tik verder,
-// anders kost elk woord een dode tik.
-let spraakKapot = false;
+// anders kost elk woord een dode tik. Pas na twee keer niets, en de eerste keer met ruim de tijd: een koude
+// stem (Google TTS, iOS-verbeterde stem) doet er soms langer dan 1,5 s over. Bij een nieuwe categorie weer proberen.
+let spraakKapot = false, warm = false, missers = 0, wacht = 0;
 const kanPraten = () => geluidAan && !!window.speechSynthesis && !geenNl && !spraakKapot;
-const stil = () => { if (window.speechSynthesis?.speaking || window.speechSynthesis?.pending) speechSynthesis.cancel(); };
+const stil = () => {
+  clearTimeout(wacht); // zelf afgebroken is geen mislukte spraak
+  if (window.speechSynthesis?.speaking || window.speechSynthesis?.pending) speechSynthesis.cancel();
+};
 function zeg(tekst) {
   if (!kanPraten()) return;
   stil(); // alleen als er iets loopt: speak() direct na een onnodige cancel() verliest op iOS/Android soms het woord
+  if (speechSynthesis.paused) speechSynthesis.resume(); // iOS blijft na de achtergrond soms op pauze hangen
   const u = new SpeechSynthesisUtterance(tekst);
   u.lang = "nl-NL"; u.rate = 0.8; u.pitch = 1.1;
   if (stem) u.voice = stem;
-  const wacht = setTimeout(() => { spraakKapot = true; }, 1500);
-  u.onstart = () => clearTimeout(wacht);
-  u.onerror = (e) => { clearTimeout(wacht); if (e.error !== "interrupted" && e.error !== "canceled") spraakKapot = true; };
+  const mis = () => { if (++missers >= 2) spraakKapot = true; };
+  wacht = setTimeout(mis, warm ? 1500 : 3000);
+  u.onstart = () => { clearTimeout(wacht); warm = true; missers = 0; };
+  u.onend = () => clearTimeout(wacht);
+  u.onerror = (e) => { clearTimeout(wacht); if (e.error !== "interrupted" && e.error !== "canceled") mis(); };
   speechSynthesis.speak(u);
 }
 
 const schud = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
-let huidig = null, rij = [], pos = 0, laatste = 0, terugBezig = false, gezegd = false;
-function toon() {
-  const [w, img] = rij[pos];
+// Plaatjes vooraf laden en decoderen, zodat plaatje en woord samen verschijnen in plaats van het nieuwe woord
+// onder het oude (of een leeg) plaatje.
+const geladen = new Map();
+function laad(img) {
+  if (!geladen.has(img)) { const i = new Image(); i.src = "img/" + img + ".svg"; geladen.set(img, i.decode().catch(() => {})); }
+  return geladen.get(img);
+}
+let huidig = null, rij = [], pos = 0, laatste = 0, terugBezig = false, gezegd = false, toonNr = 0;
+async function toon() {
+  const nr = ++toonNr, [w, img] = rij[pos];
+  gezegd = false;
+  await Promise.race([laad(img), new Promise((r) => setTimeout(r, 150))]); // traag toestel: niet te lang wachten
+  if (nr !== toonNr) return;
   plaatje.src = "img/" + img + ".svg";
   woord.textContent = w;
   animeer("pop");
-  gezegd = false;
+  laad(rij[(pos + 1) % rij.length][1]);
 }
 function animeer(naam) {
   for (const el of [plaatje, woord]) { el.classList.remove("pop", "zeg"); void el.offsetWidth; el.classList.add(naam); }
@@ -53,7 +70,7 @@ function animeer(naam) {
 // Wild tikken van kleine handjes niet laten doorrazen.
 function tikMag() {
   const nu = Date.now();
-  if (nu - laatste < 300) return false;
+  if (nu - laatste < 200) return false;
   laatste = nu;
   return true;
 }
@@ -79,6 +96,8 @@ function volgende() {
 function start(cat) {
   if (kaart.classList.contains("on")) return; // twee vingers op twee tegels: maar één keer pushState
   huidig = cat; rij = cat.opVolgorde ? cat.woorden : schud(cat.woorden); pos = 0; laatste = Date.now();
+  spraakKapot = false; missers = 0;
+  vingers.clear(); kaart.classList.remove("druk");
   home.classList.remove("on"); kaart.classList.add("on");
   history.pushState({ kaart: true }, "");
   toon();
@@ -92,10 +111,21 @@ function naarHome() {
 // pointerup in plaats van click: een peuter drukt lang, schuift een beetje of legt er twee vingers op, en dan
 // vuurt click niet (de browser ziet een sleep, lange druk of pinch). Met touch-action:none op de kaart komt
 // pointerup altijd door, en het telt (anders dan pointerdown) als gebruikersgebaar, nodig voor spraak op iOS.
-kaart.addEventListener("pointerup", (e) => {
+// Bij het neerzetten van de vinger deukt de kaart al in, zodat een lange druk niet voelt als "doet niks".
+// Alleen vingers die óp de kaart begonnen tellen: niet de tweede vinger die nog op een tegel lag.
+const vingers = new Set();
+kaart.addEventListener("pointerdown", (e) => {
   if (e.button > 0 || e.target.closest("#terug")) return;
-  tik();
+  vingers.add(e.pointerId);
+  kaart.classList.add("druk");
 });
+const los = (e) => {
+  const telt = vingers.delete(e.pointerId);
+  if (!vingers.size) kaart.classList.remove("druk");
+  return telt;
+};
+kaart.addEventListener("pointerup", (e) => { if (los(e)) tik(); });
+kaart.addEventListener("pointercancel", los);
 $("terug").addEventListener("click", (e) => {
   e.stopPropagation();
   if (!kaart.classList.contains("on") || terugBezig) return; // history.back() is async: dubbeltik zou de app verlaten
@@ -122,7 +152,17 @@ for (const cat of self.CATEGORIES) {
   b.className = "cat";
   b.style.background = cat.kleur;
   b.innerHTML = `<img src="img/${cat.img}.svg" alt=""><span>${cat.naam}</span>`;
-  b.onclick = () => start(cat);
+  // Ook de tegels op pointerup: een lange druk of een tweede vinger slikt click in. Wie echt scrolt krijgt
+  // pointercancel en opent niets. click blijft voor het toetsenbord (detail 0).
+  let id = null, x = 0, y = 0;
+  b.addEventListener("pointerdown", (e) => { if (e.button === 0 && id === null) ({ pointerId: id, clientX: x, clientY: y } = e); });
+  b.addEventListener("pointerup", (e) => {
+    if (e.pointerId !== id) return;
+    id = null;
+    if (Math.hypot(e.clientX - x, e.clientY - y) < 25) start(cat);
+  });
+  b.addEventListener("pointercancel", (e) => { if (e.pointerId === id) id = null; });
+  b.onclick = (e) => { if (e.detail === 0) start(cat); };
   cats.append(b);
 }
 
