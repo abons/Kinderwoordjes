@@ -44,20 +44,24 @@ function toon() {
   const [w, img] = rij[pos];
   plaatje.src = "img/" + img + ".svg";
   woord.textContent = w;
-  for (const el of [plaatje, woord]) { el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); }
+  animeer("pop");
   gezegd = false;
+}
+function animeer(naam) {
+  for (const el of [plaatje, woord]) { el.classList.remove("pop", "zeg"); void el.offsetWidth; el.classList.add(naam); }
 }
 // Wild tikken van kleine handjes niet laten doorrazen.
 function tikMag() {
   const nu = Date.now();
-  if (nu - laatste < 400) return false;
+  if (nu - laatste < 300) return false;
   laatste = nu;
   return true;
 }
 // Eerst kijken: de eerste tik zegt het woord, de tweede gaat verder. Zonder geluid gaat één tik verder.
 function tik() {
   if (!tikMag()) return;
-  if (kanPraten() && !gezegd) { gezegd = true; zeg(rij[pos][0]); }
+  // Wiebel bij het voorlezen: ook als het toestel op stil staat, ziet het kind dat de tik aankwam.
+  if (kanPraten() && !gezegd) { gezegd = true; animeer("zeg"); zeg(rij[pos][0]); }
   else volgende();
 }
 function volgende() {
@@ -85,7 +89,13 @@ function naarHome() {
   kaart.classList.remove("on"); home.classList.add("on");
 }
 
-kaart.addEventListener("click", tik);
+// pointerup in plaats van click: een peuter drukt lang, schuift een beetje of legt er twee vingers op, en dan
+// vuurt click niet (de browser ziet een sleep, lange druk of pinch). Met touch-action:none op de kaart komt
+// pointerup altijd door, en het telt (anders dan pointerdown) als gebruikersgebaar, nodig voor spraak op iOS.
+kaart.addEventListener("pointerup", (e) => {
+  if (e.button > 0 || e.target.closest("#terug")) return;
+  tik();
+});
 $("terug").addEventListener("click", (e) => {
   e.stopPropagation();
   if (!kaart.classList.contains("on") || terugBezig) return; // history.back() is async: dubbeltik zou de app verlaten
