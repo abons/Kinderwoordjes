@@ -2,7 +2,9 @@ package com.hrbons.kinderwoordjes
 
 import android.app.Activity
 import android.content.res.Configuration
+import android.graphics.Paint
 import android.graphics.Typeface
+import android.text.TextPaint
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -39,7 +41,9 @@ class MainActivity : Activity() {
     private val tekstKleur = 0xFF3B2F2F.toInt()
     private val achtergrond = 0xFFFFF4E0.toInt()
     private val wit = 0xFFFFFFFF.toInt()
-    private val letter by lazy { Typeface.create("casual", Typeface.BOLD) }
+    // "casual" (Coming Soon) is de kinderletter van Android; hij heeft geen vette variant, dus komt het vet
+    // van FAKE_BOLD_TEXT_FLAG op elke tekst.
+    private val letter by lazy { Typeface.create("casual", Typeface.NORMAL) }
 
     private lateinit var categorieen: List<Categorie>
     private lateinit var scherm: FrameLayout
@@ -95,6 +99,7 @@ class MainActivity : Activity() {
         val titel = TextView(this).apply {
             text = getString(R.string.titel)
             typeface = letter
+            paintFlags = paintFlags or Paint.FAKE_BOLD_TEXT_FLAG
             setTextColor(tekstKleur)
             setTextSize(TypedValue.COMPLEX_UNIT_PX, (breed * 0.06f).coerceIn(px(24f), px(40f)))
         }
@@ -142,6 +147,7 @@ class MainActivity : Activity() {
         addView(TextView(context).apply {
             text = cat.naam
             typeface = letter
+            paintFlags = paintFlags or Paint.FAKE_BOLD_TEXT_FLAG
             gravity = Gravity.CENTER
             setTextColor(tekstKleur)
             setTextSize(TypedValue.COMPLEX_UNIT_PX, labelMaat)
@@ -154,6 +160,7 @@ class MainActivity : Activity() {
         plaatje = ImageView(this).apply { scaleType = ImageView.ScaleType.FIT_CENTER }
         woord = TextView(this).apply {
             typeface = letter
+            paintFlags = paintFlags or Paint.FAKE_BOLD_TEXT_FLAG
             gravity = Gravity.CENTER
             setTextColor(tekstKleur)
             maxLines = 1
@@ -193,8 +200,10 @@ class MainActivity : Activity() {
         (woord.layoutParams as LinearLayout.LayoutParams).topMargin = (h * 0.04f).toInt()
         var maat = (w * 0.13f).coerceIn(dp(44f).toFloat(), dp(110f).toFloat())
         val ruimte = w - dp(32f)
-        woord.paint.textSize = maat
-        val nodig = woord.paint.measureText(woord.text.toString()) * (1 + woord.letterSpacing)
+        // Meten op een kopie: zet je de maat op woord.paint zelf, dan ziet setTextSize hieronder geen
+        // verschil, en blijft de TextView op zijn oude (kleine) maat staan.
+        val meet = TextPaint(woord.paint).apply { textSize = maat }
+        val nodig = meet.measureText(woord.text.toString()) * (1 + woord.letterSpacing)
         if (nodig > ruimte) maat *= ruimte / nodig
         woord.setTextSize(TypedValue.COMPLEX_UNIT_PX, maat)
     }
