@@ -28,9 +28,9 @@ adb logcat -c
 adb shell am start -W -n "$PKG/.MainActivity"
 sleep 4
 shot 1-home
-ui | grep -o 'content-desc="[^"]*"' | head -20
+echo "--- schermindeling ---"; ui | sed 's/<node /\n<node /g' | grep -o '<node [^>]*' | sed -E 's/ (checkable|checked|clickable|enabled|focusable|focused|scrollable|long-clickable|password|selected|resource-id|index)="[^"]*"//g' | head -60; echo "---"
 
-read -r X Y < <(midden Dieren)
+read -r X Y < <(midden Dieren) || { echo "FOUT: tegel Dieren niet gevonden"; exit 1; }
 echo "tegel Dieren op $X,$Y: 1,5 s ingedrukt"
 houd "$X" "$Y"
 shot 2-kaart
