@@ -6,10 +6,31 @@ const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch {} },
 };
+// Kleine kinderen houden hun vinger vaak even op het scherm. Na ±0,5 s maakt de browser er "lang indrukken" van
+// en komt er geen click meer. Daarom reageren we zelf op de vinger: knoppen bij het loslaten (hoe lang ook
+// ingedrukt, mits er niet gescrold is), de kaart al bij het neerzetten. De click die daarna nog komt negeren we;
+// die is er alleen nog voor het toetsenbord.
+let pointerTik = 0;
+const vingerTik = () => { pointerTik = Date.now(); };
+const isGhost = () => Date.now() - pointerTik < 700;
+function opTik(el, fn) {
+  let begin = null;
+  el.addEventListener("pointerdown", (e) => { begin = e.isPrimary && e.button === 0 ? { id: e.pointerId, x: e.clientX, y: e.clientY } : null; });
+  el.addEventListener("pointercancel", () => { begin = null; }); // de browser neemt het over, bv. om te scrollen
+  el.addEventListener("pointerup", (e) => {
+    if (!begin || e.pointerId !== begin.id) return;
+    const ver = Math.hypot(e.clientX - begin.x, e.clientY - begin.y) > 20;
+    begin = null;
+    if (ver) return;
+    vingerTik();
+    fn(e);
+  });
+  el.addEventListener("click", (e) => { if (!isGhost()) fn(e); });
+}
 let geluidAan = store.get("geluid") !== "uit";
 const toonGeluid = () => { geluid.textContent = geluidAan ? "🔊" : "🔇"; geluid.setAttribute("aria-pressed", String(geluidAan)); };
 toonGeluid();
-geluid.onclick = () => { geluidAan = !geluidAan; store.set("geluid", geluidAan ? "aan" : "uit"); toonGeluid(); };
+opTik(geluid, () => { geluidAan = !geluidAan; store.set("geluid", geluidAan ? "aan" : "uit"); toonGeluid(); });
 
 // Voorlezen met de Nederlandse stem van het toestel, als die er is.
 // Geen Nederlandse stem (terwijl de lijst wel geladen is)? Dan zwijgen: een Engelse stem leert verkeerde klanken.
@@ -85,9 +106,13 @@ function naarHome() {
   kaart.classList.remove("on"); home.classList.add("on");
 }
 
-kaart.addEventListener("click", tik);
-$("terug").addEventListener("click", (e) => {
-  e.stopPropagation();
+kaart.addEventListener("pointerdown", (e) => {
+  if (!e.isPrimary || e.button !== 0 || e.target.closest("#terug")) return;
+  vingerTik();
+  tik();
+});
+kaart.addEventListener("click", (e) => { if (!isGhost() && !e.target.closest("#terug")) tik(); });
+opTik($("terug"), () => {
   if (!kaart.classList.contains("on") || terugBezig) return; // history.back() is async: dubbeltik zou de app verlaten
   terugBezig = true;
   history.back();
@@ -112,7 +137,7 @@ for (const cat of self.CATEGORIES) {
   b.className = "cat";
   b.style.background = cat.kleur;
   b.innerHTML = `<img src="img/${cat.img}.svg" alt=""><span>${cat.naam}</span>`;
-  b.onclick = () => start(cat);
+  opTik(b, () => start(cat));
   cats.append(b);
 }
 
@@ -126,7 +151,7 @@ window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); inst
 window.addEventListener("appinstalled", () => { installeer.hidden = true; installPrompt = null; });
 // In-app browsers (WhatsApp, Instagram, Facebook, Gmail…) kunnen niet op het beginscherm zetten: eerst naar Safari.
 const inApp = /FBAN|FBAV|Instagram|Line\/|WhatsApp|GSA\/|Snapchat|LinkedInApp/.test(navigator.userAgent);
-installeer.onclick = async () => {
+opTik(installeer, async () => {
   if (installPrompt) {
     // prompt() mag maar één keer per event, en Chrome vuurt pas bij een volgende paginalading een nieuwe
     const p = installPrompt;
@@ -139,6 +164,6 @@ installeer.onclick = async () => {
       ? "Open deze pagina eerst in Safari. Tik daar op Delen (vierkantje met pijltje) en kies \"Zet op beginscherm\"."
       : "Zet Woordjes op je beginscherm: tik op Delen (vierkantje met pijltje, soms onder •••) en kies \"Zet op beginscherm\".");
   }
-};
+});
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js", { updateViaCache: "none" });
