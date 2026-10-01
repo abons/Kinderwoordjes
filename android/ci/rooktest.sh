@@ -24,7 +24,11 @@ adb shell am start -W -n "$PKG/.MainActivity"
 sleep 4
 shot 1-home
 # Android meldt de eerste keer schermvullend "Viewing full screen"; op een echt toestel tik je dat één keer weg.
-if read -r X Y < <(midden "Got it"); then echo "melding schermvullend weggetikt"; adb shell input tap "$X" "$Y"; sleep 1.5; shot 1b-home; fi
+# Op Android 6 komt hij pas na een paar seconden, dus even blijven kijken.
+for _ in 1 2 3 4 5 6; do
+  if read -r X Y < <(midden "Got it"); then echo "melding schermvullend weggetikt"; adb shell input tap "$X" "$Y"; sleep 1.5; shot 1b-home; break; fi
+  sleep 1
+done
 echo "--- schermindeling ---"; ui | sed 's/<node /\n<node /g' | grep -o '<node [^>]*' | sed -E 's/ (checkable|checked|clickable|enabled|focusable|focused|scrollable|long-clickable|password|selected|resource-id|index)="[^"]*"//g' | head -60; echo "---"
 
 read -r X Y < <(midden Dieren) || { echo "FOUT: tegel Dieren niet gevonden"; exit 1; }
