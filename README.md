@@ -6,7 +6,8 @@ Een PWA voor peuters (±3 jaar) om eerste Nederlandse woordjes te leren. Kies ee
 een groot plaatje met het woord eronder. De eerste tik laat het toestel het woord voorlezen, de
 tweede tik gaat naar het volgende woord. Staat het geluid uit, of kan het toestel geen Nederlands
 praten, dan gaat één tik meteen verder. Eén knop (het huisje) brengt je terug naar de categorieën,
-net als de terugknop van Android.
+net als de terugknop van Android. In de geïnstalleerde app (schermvullend) sluit één keer terug op
+het beginscherm de app niet: daarvoor moet je twee keer terug zonder tik ertussen.
 
 Net zo licht als de zusterapps: gewone HTML + JavaScript, **geen framework, geen build-stap en geen
 runtime-afhankelijkheden**. Na het eerste bezoek werkt alles offline, want de service worker zet de
