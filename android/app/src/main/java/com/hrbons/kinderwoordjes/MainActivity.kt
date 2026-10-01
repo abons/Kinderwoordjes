@@ -75,6 +75,7 @@ class MainActivity : Activity() {
         bouwKaart()
         bouwHome()
         setContentView(scherm)
+        randen()
         schermVullend()
         startStem()
 
@@ -107,7 +108,6 @@ class MainActivity : Activity() {
             gravity = Gravity.CENTER
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f)
             background = vlak(wit, 28f, 4f)
-            contentDescription = getString(R.string.voorlezen)
             opTik { geluidAan = !geluidAan; prefs.edit().putBoolean("geluid", geluidAan).apply(); toonGeluid() }
         }
         toonGeluid()
@@ -157,7 +157,7 @@ class MainActivity : Activity() {
     }
 
     private fun bouwKaart() {
-        plaatje = ImageView(this).apply { scaleType = ImageView.ScaleType.FIT_CENTER }
+        plaatje = ImageView(this).apply { scaleType = ImageView.ScaleType.FIT_XY } // vierkant; zie Vierkant
         woord = TextView(this).apply {
             typeface = letter
             paintFlags = paintFlags or Paint.FAKE_BOLD_TEXT_FLAG
@@ -198,12 +198,13 @@ class MainActivity : Activity() {
     private fun pasWoord(w: Int = kaart.width, h: Int = kaart.height) {
         if (w <= 0) return
         (woord.layoutParams as LinearLayout.LayoutParams).topMargin = (h * 0.04f).toInt()
+        woord.requestLayout()
         var maat = (w * 0.13f).coerceIn(dp(44f).toFloat(), dp(110f).toFloat())
         val ruimte = w - dp(32f)
         // Meten op een kopie: zet je de maat op woord.paint zelf, dan ziet setTextSize hieronder geen
         // verschil, en blijft de TextView op zijn oude (kleine) maat staan.
         val meet = TextPaint(woord.paint).apply { textSize = maat }
-        val nodig = meet.measureText(woord.text.toString()) * (1 + woord.letterSpacing)
+        val nodig = meet.measureText(woord.text.toString()) // inclusief letterSpacing
         if (nodig > ruimte) maat *= ruimte / nodig
         woord.setTextSize(TypedValue.COMPLEX_UNIT_PX, maat)
     }
@@ -211,6 +212,14 @@ class MainActivity : Activity() {
     private fun start(cat: Categorie) {
         if (opKaart) return // twee vingers op twee tegels
         rij = Rij(cat.woorden, cat.opVolgorde)
+        // Was de stem kapot of nog niet Nederlands (bv. stem werd net gedownload)? Bij elke categorie
+        // opnieuw proberen, anders blijft hij stil tot de app opnieuw start.
+        if (spraakKapot || !stemOk) {
+            tts?.shutdown()
+            spraakKapot = false
+            stemOk = false
+            startStem()
+        }
         laatste = SystemClock.uptimeMillis()
         home?.visibility = View.GONE
         kaart.visibility = View.VISIBLE
@@ -250,9 +259,8 @@ class MainActivity : Activity() {
     private fun tik() {
         if (!opKaart || !tikMag()) return
         val w = rij?.huidig ?: return
-        if (kanPraten && !gezegd) {
+        if (kanPraten && !gezegd && zeg(w.tekst)) {
             gezegd = true
-            zeg(w.tekst)
         } else {
             tts?.stop() // niet het oude woord horen bij het nieuwe plaatje
             rij?.volgende()
@@ -267,17 +275,21 @@ class MainActivity : Activity() {
 
     private fun toonGeluid() {
         geluidKnop.text = if (geluidAan) "🔊" else "🔇"
-        geluidKnop.isSelected = geluidAan
+        geluidKnop.contentDescription = getString(if (geluidAan) R.string.voorlezen_aan else R.string.voorlezen_uit)
     }
 
     // ---- voorlezen ----
 
     private fun startStem() {
-        tts = TextToSpeech(applicationContext) { status ->
-            val t = tts ?: return@TextToSpeech
+        var nieuw: TextToSpeech? = null
+        nieuw = TextToSpeech(applicationContext) { status ->
+            val t = nieuw ?: return@TextToSpeech
+            if (t !== tts) return@TextToSpeech // een oudere, al afgesloten instantie
             if (status != TextToSpeech.SUCCESS) return@TextToSpeech
             // Geen Nederlandse stem? Dan zwijgen: een Engelse stem leert verkeerde klanken.
-            stemOk = t.setLanguage(Locale("nl", "NL")) >= TextToSpeech.LANG_AVAILABLE
+            stemOk = t.setLanguage(Locale("nl", "NL")) >= TextToSpeech.LANG_AVAILABLE &&
+                // Google TTS meldt een stem die nog gedownload moet worden als beschikbaar
+                t.voice?.features?.contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED) != true
             t.setSpeechRate(0.8f)
             t.setPitch(1.1f)
             t.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
@@ -287,10 +299,14 @@ class MainActivity : Activity() {
                 override fun onError(utteranceId: String?) { runOnUiThread { spraakKapot = true } }
             })
         }
+        tts = nieuw
     }
 
-    private fun zeg(tekst: String) {
-        tts?.speak(tekst, TextToSpeech.QUEUE_FLUSH, null, "woord")
+    /** false als de stem het niet aanneemt (bv. de TTS-dienst is herstart): dan gaat deze tik gewoon verder. */
+    private fun zeg(tekst: String): Boolean {
+        val ok = tts?.speak(tekst, TextToSpeech.QUEUE_FLUSH, null, "woord") == TextToSpeech.SUCCESS
+        if (!ok) spraakKapot = true
+        return ok
     }
 
     override fun onStop() {
@@ -309,7 +325,6 @@ class MainActivity : Activity() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         bouwHome() // de maten hangen af van de breedte; de kaart past zich zelf aan
-        schermVullend()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -319,13 +334,7 @@ class MainActivity : Activity() {
 
     /** Geen status- en navigatiebalk: dan tikt een peuter niet per ongeluk op terug of home. */
     private fun schermVullend() {
-        if (Build.VERSION.SDK_INT >= 28) {
-            window.attributes = window.attributes.apply {
-                layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-            }
-        }
         if (Build.VERSION.SDK_INT >= 30) {
-            window.setDecorFitsSystemWindows(false)
             window.insetsController?.apply {
                 hide(WindowInsets.Type.systemBars())
                 systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
@@ -337,14 +346,27 @@ class MainActivity : Activity() {
                 or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
         }
-        // Wel uit de camera-uitsparing blijven.
+    }
+
+    /**
+     * Tot in de hoeken tekenen, maar uit de camera-uitsparing blijven. Vanaf API 30 ook uit balken die niet
+     * weg kunnen (gesplitst scherm, vensters): verborgen balken tellen daar als 0. Daaronder alleen de
+     * uitsparing, want met LAYOUT_STABLE melden verborgen balken toch hun maat.
+     */
+    private fun randen() {
+        if (Build.VERSION.SDK_INT >= 28) {
+            window.attributes = window.attributes.apply {
+                layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
+        }
+        if (Build.VERSION.SDK_INT >= 30) window.setDecorFitsSystemWindows(false)
         scherm.setOnApplyWindowInsetsListener { v, ins ->
             when {
-                Build.VERSION.SDK_INT >= 30 -> ins.getInsets(WindowInsets.Type.displayCutout()).let { v.setPadding(it.left, it.top, it.right, it.bottom) }
+                Build.VERSION.SDK_INT >= 30 -> ins.getInsets(WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout())
+                    .let { v.setPadding(it.left, it.top, it.right, it.bottom) }
                 Build.VERSION.SDK_INT >= 28 -> ins.displayCutout.let { v.setPadding(it?.safeInsetLeft ?: 0, it?.safeInsetTop ?: 0, it?.safeInsetRight ?: 0, it?.safeInsetBottom ?: 0) }
             }
             ins
         }
-        scherm.requestApplyInsets()
     }
 }

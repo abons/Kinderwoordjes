@@ -46,15 +46,16 @@ Wat hij extra doet ten opzichte van de web-app, voor kleine kinderen:
 
 Bouwen gebeurt in GitHub Actions (`.github/workflows/android.yml`): bij elke push die `android/`,
 `words.js`, `img/` of `icon.svg` raakt, de unit-tests, een release-build en een rooktest op een
-emulator (`android/ci/rooktest.sh`: lang indrukken, terug, draaien; de schermafdrukken staan in het
-log). Bij een push naar `Main` komt de APK bij een nieuwe release.
+emulator op Android 6, 10 en 14 (`android/ci/rooktest.sh`: lang indrukken, terug, draaien; de
+schermafdrukken komen op de branches `ci-schermafdrukken-api<N>`). Bij een push naar `Main` komt de
+APK bij een nieuwe release, maar alleen als de vaste sleutel is ingesteld (zie hieronder).
 
 Lokaal bouwen kan ook, met dezelfde toolchain als de zusterapps (JDK 17, AGP 8.7.3, Gradle 8.9,
 Kotlin 2.0.21): `cd android && gradlew assembleDebug`.
 
 ⚠️ **Ondertekenen.** Zonder eigen sleutel ondertekent CI met een debugsleutel die per run
-verschilt, en dan installeert een nieuwe APK niet over de vorige heen (eerst de oude verwijderen).
-Eén keer instellen, dan is dat over:
+verschilt, en dan installeert een nieuwe APK niet over de vorige heen. Daarom maakt CI zonder sleutel
+**geen release** (de build zelf en de APK als artifact gaan wel door). Eén keer instellen:
 
 1. Maak een sleutel: `keytool -genkeypair -v -keystore woordjes.jks -alias woordjes -keyalg RSA -keysize 2048 -validity 10000`
    (bewaar hem goed: zonder deze sleutel kan je de app nooit meer bijwerken).

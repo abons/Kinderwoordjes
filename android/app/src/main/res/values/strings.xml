@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Woordjes</string>
     <string name="titel">Woordjes</string>
-    <string name="voorlezen">Voorlezen</string>
+    <string name="voorlezen_aan">Voorlezen staat aan</string>
+    <string name="voorlezen_uit">Voorlezen staat uit</string>
     <string name="terug">Terug naar de categorieën</string>
 </resources>

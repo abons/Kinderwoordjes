@@ -11,7 +11,7 @@ shot() { adb exec-out screencap -p > "shots/$1.png"; }
 ui() { adb shell uiautomator dump /sdcard/ui.xml >/dev/null && adb shell cat /sdcard/ui.xml; }
 # midden van het element met deze content-desc of tekst
 midden() {
-  ui | perl -ne 'while (/<node [^>]*?(?:content-desc|text)="\Q'"$1"'\E"[^>]*?bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/g) { print int(($1+$3)/2), " ", int(($2+$4)/2), "\n"; exit }'
+  ui | perl -ne 'while (/<node [^>]*?(?:content-desc|text)="(?i:\Q'"$1"'\E)"[^>]*?bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/g) { print int(($1+$3)/2), " ", int(($2+$4)/2), "\n"; exit }'
 }
 woord() { ui | perl -ne 'while (/<node [^>]*?text="([^"]+)"[^>]*?class="android.widget.TextView"/g) { print "$1\n"; exit }'; }
 vooraan() { adb shell dumpsys activity activities | grep -E "topResumedActivity|mResumedActivity" | head -1; }

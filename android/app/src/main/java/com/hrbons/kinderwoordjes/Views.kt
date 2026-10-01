@@ -39,12 +39,17 @@ fun View.opTik(actie: () -> Unit) {
     val diep = dp(4f).toFloat()
     var x = 0f
     var y = 0f
+    var vinger = 0
     var actief = false
     fun los() { actief = false; translationY = 0f }
     setOnTouchListener { _, e ->
         when (e.actionMasked) {
-            MotionEvent.ACTION_DOWN -> { x = e.x; y = e.y; actief = true; translationY = diep }
-            MotionEvent.ACTION_MOVE -> if (actief && hypot(e.x - x, e.y - y) > slop) los()
+            MotionEvent.ACTION_DOWN -> { vinger = e.getPointerId(0); x = e.x; y = e.y; actief = true; translationY = diep }
+            // de eerste vinger volgen: til je die op, dan schuift index 0 naar een tweede vinger
+            MotionEvent.ACTION_MOVE -> {
+                val i = e.findPointerIndex(vinger)
+                if (actief && i >= 0 && hypot(e.getX(i) - x, e.getY(i) - y) > slop) los()
+            }
             MotionEvent.ACTION_UP -> { val was = actief; los(); if (was) actie() }
             MotionEvent.ACTION_CANCEL -> los()
         }
@@ -56,7 +61,9 @@ fun View.opTik(actie: () -> Unit) {
 /** Een vierkant plaatje: [fractie] van de beschikbare breedte, hoogstens [max] px. */
 class Vierkant(context: Context, private val fractie: Float, private val max: Int) : ImageView(context) {
     init {
-        scaleType = ScaleType.FIT_CENTER
+        // FIT_XY en geen FIT_CENTER: het vlak is al vierkant, en vóór Android 7 tekent een VectorDrawable op
+        // zijn eigen maat (36dp) en wordt hij met FIT_CENTER opgerekt, dus wazig.
+        scaleType = ScaleType.FIT_XY
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
