@@ -19,6 +19,9 @@ moetVooraan() { vooraan | grep -q "$PKG" || { echo "FOUT: app staat niet meer vo
 houd() { adb shell input swipe "$1" "$2" "$1" "$2" 1500; sleep 1.5; }
 
 adb install -r "$APK"
+# De melding "Viewing full screen" die je op een toestel één keer wegtikt; op Android 6 ziet uiautomator hem
+# niet eens (apart systeemvenster), dus vooraf als gezien markeren.
+adb shell settings put secure immersive_mode_confirmations confirmed
 adb logcat -c
 adb shell am start -W -n "$PKG/.MainActivity"
 sleep 4
