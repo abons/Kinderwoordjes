@@ -102,6 +102,7 @@ function start(cat) {
   if (kaart.classList.contains("on")) return; // twee vingers op twee tegels: maar één keer pushState
   huidig = cat; rij = cat.opVolgorde ? cat.woorden : schud(cat.woorden); pos = 0; laatste = Date.now();
   home.classList.remove("on"); kaart.classList.add("on");
+  bewaak(); // voor als er geen pointerdown/keydown was, bv. een schermlezer
   history.pushState({ kaart: true }, "");
   toon();
 }
@@ -131,6 +132,15 @@ opTik($("terug"), terug);
 // oude state er nog; die wissen we, anders doet de volgende terug-druk zichtbaar niets.
 if (history.state?.kaart) history.replaceState(null, "");
 window.addEventListener("popstate", (e) => { if (!e.state?.kaart) naarHome(); });
+// In de geïnstalleerde app sluit terug (knop of veeg vanaf de rand) op het beginscherm de app. Daarom ligt daar
+// een extra "bewaker"-stap in de geschiedenis: terug haalt die weg en je blijft in de app. Bij de volgende tik
+// komt hij terug; pas twee keer terug zonder tik ertussen sluit de app. Chrome slaat bij terug stappen over die
+// zonder gebruikersactie zijn gezet. Bij touch telt pas het loslaten als actie, maar die maakt de stap van het
+// neerzetten alsnog geldig. Wordt de tik een veeg (scrollen), dan niet, en sluit één keer terug de app toch.
+const alsApp = matchMedia("(display-mode: standalone), (display-mode: fullscreen)").matches || navigator.standalone === true;
+const bewaak = () => { if (alsApp && history.state === null) history.pushState({ bewaker: true }, ""); };
+document.addEventListener("pointerdown", bewaak, true);
+document.addEventListener("keydown", bewaak, true);
 document.addEventListener("keydown", (e) => {
   if (!kaart.classList.contains("on") || e.repeat) return; // ingedrukt houden raast niet door de woorden
   if (e.target === $("terug") && (e.key === " " || e.key === "Enter")) return; // laat de knop zelf naar huis gaan
@@ -153,7 +163,6 @@ for (const cat of self.CATEGORIES) {
 
 // Installeren als app: Chrome/Edge geven een eigen prompt (beforeinstallprompt), iOS niet, daar leggen we het uit.
 const installeer = $("installeer");
-const alsApp = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 let installPrompt = null;
 if (!alsApp && iOS) installeer.hidden = false;

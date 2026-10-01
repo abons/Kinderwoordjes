@@ -4,7 +4,7 @@
   "lang": "nl",
   "id": "./",
   "start_url": ".",
-  "display": "standalone",
+  "display": "fullscreen",
   "orientation": "any",
   "background_color": "#fff4e0",
   "theme_color": "#fff4e0",
