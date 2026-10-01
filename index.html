@@ -17,6 +17,7 @@
   body { background:var(--bg); color:var(--text); overflow:hidden; user-select:none; -webkit-user-select:none;
     -webkit-touch-callout:none; touch-action:manipulation;
     font-family:"Comic Sans MS","Chalkboard SE","Baloo 2",ui-rounded,system-ui,sans-serif; }
+  img { -webkit-user-drag:none; pointer-events:none; } /* lang indrukken op een plaatje: niet slepen of bewaren */
   .screen { position:fixed; inset:0; display:none; padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
   .screen.on { display:flex; }
 
@@ -33,7 +34,7 @@
   .cat img { width:70%; max-width:130px; aspect-ratio:1; }
   .cat:active { transform:translateY(4px); box-shadow:0 2px 0 rgba(0,0,0,.12); }
 
-  #kaart { flex-direction:column; align-items:center; justify-content:center; cursor:pointer; }
+  #kaart { flex-direction:column; align-items:center; justify-content:center; cursor:pointer; touch-action:none; }
   #plaatje { width:min(70vw,55vh); aspect-ratio:1; filter:drop-shadow(0 8px 0 rgba(0,0,0,.12)); }
   #woord { margin-top:4vh; font-size:clamp(44px,13vw,110px); font-weight:bold; letter-spacing:.02em; text-align:center; padding:0 16px; }
   .pop { animation:pop .35s cubic-bezier(.3,1.6,.6,1); }
