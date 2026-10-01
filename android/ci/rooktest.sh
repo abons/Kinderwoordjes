@@ -1,18 +1,13 @@
 #!/usr/bin/env bash
 # Rooktest op de emulator in GitHub Actions: installeren, starten, lang indrukken op een tegel en op de
 # kaart, terug, en nog eens terug op het beginscherm (de app moet dan open blijven). Schermafdrukken komen
-# als klein JPEG in base64 in het log, tussen "SHOT <naam> BEGIN" en "END".
+# in shots/; de workflow zet die op de branch ci-schermafdrukken.
 set -euo pipefail
 APK="$1"
 PKG=com.hrbons.kinderwoordjes
 
-shot() {
-  adb exec-out screencap -p > "$1.png"
-  if command -v convert >/dev/null; then
-    convert "$1.png" -resize 300x -quality 50 "$1.jpg"
-    echo "SHOT $1 BEGIN"; base64 -w0 "$1.jpg"; echo; echo "SHOT $1 END"
-  fi
-}
+mkdir -p shots
+shot() { adb exec-out screencap -p > "shots/$1.png"; }
 ui() { adb shell uiautomator dump /sdcard/ui.xml >/dev/null && adb shell cat /sdcard/ui.xml; }
 # midden van het element met deze content-desc of tekst
 midden() {
@@ -28,6 +23,8 @@ adb logcat -c
 adb shell am start -W -n "$PKG/.MainActivity"
 sleep 4
 shot 1-home
+# Android meldt de eerste keer schermvullend "Viewing full screen"; op een echt toestel tik je dat één keer weg.
+if read -r X Y < <(midden "Got it"); then echo "melding schermvullend weggetikt"; adb shell input tap "$X" "$Y"; sleep 1.5; shot 1b-home; fi
 echo "--- schermindeling ---"; ui | sed 's/<node /\n<node /g' | grep -o '<node [^>]*' | sed -E 's/ (checkable|checked|clickable|enabled|focusable|focused|scrollable|long-clickable|password|selected|resource-id|index)="[^"]*"//g' | head -60; echo "---"
 
 read -r X Y < <(midden Dieren) || { echo "FOUT: tegel Dieren niet gevonden"; exit 1; }

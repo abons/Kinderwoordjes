@@ -86,6 +86,8 @@ jobs:
     needs: bouwen
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -93,9 +95,8 @@ jobs:
         with:
           name: apk
 
-      - name: KVM aan, ImageMagick voor de schermafdrukken
+      - name: KVM aan
         run: |
-          sudo apt-get install -y -qq imagemagick >/dev/null || true
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
@@ -110,6 +111,19 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: bash android/ci/rooktest.sh kinderwoordjes.apk
+
+      # Op een eigen branch, zodat je ze met git kunt bekijken zonder in te loggen bij Actions.
+      - name: Schermafdrukken naar de branch ci-schermafdrukken
+        if: always() && github.event_name == 'push'
+        run: |
+          [ -d shots ] || exit 0
+          cd shots
+          git init -q -b ci-schermafdrukken
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          echo "Rooktest van ${GITHUB_REF_NAME} @ ${GITHUB_SHA}, run ${GITHUB_RUN_NUMBER}" > README.md
+          git add -A && git commit -qm "Rooktest run ${GITHUB_RUN_NUMBER} (${GITHUB_SHA::7})"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:ci-schermafdrukken
 
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/Main'
