@@ -13,17 +13,22 @@ const store = {
 let pointerTik = 0;
 const vingerTik = () => { pointerTik = Date.now(); };
 const isGhost = () => Date.now() - pointerTik < 700;
+// Een tik om een draaiende lijst te stoppen is geen keuze (de browser geeft dan ook geen click).
+let laatsteScroll = 0;
+document.addEventListener("scroll", () => { laatsteScroll = Date.now(); }, { capture: true, passive: true });
 function opTik(el, fn) {
   let begin = null;
-  el.addEventListener("pointerdown", (e) => { begin = e.isPrimary && e.button === 0 ? { id: e.pointerId, x: e.clientX, y: e.clientY } : null; });
+  el.addEventListener("pointerdown", (e) => { begin = e.isPrimary && e.button === 0 ? { id: e.pointerId, x: e.clientX, y: e.clientY, t: Date.now() } : null; });
   el.addEventListener("pointercancel", () => { begin = null; }); // de browser neemt het over, bv. om te scrollen
   el.addEventListener("pointerup", (e) => {
     if (!begin || e.pointerId !== begin.id) return;
     const ver = Math.hypot(e.clientX - begin.x, e.clientY - begin.y) > 20;
+    const gescrold = laatsteScroll > begin.t - 150;
     begin = null;
-    if (ver) return;
+    if (ver || gescrold) return;
     vingerTik();
     fn(e);
+    vingerTik(); // fn kan blokkeren (alert); de click die daarna komt hoort nog bij deze tik
   });
   el.addEventListener("click", (e) => { if (!isGhost()) fn(e); });
 }
@@ -111,12 +116,17 @@ kaart.addEventListener("pointerdown", (e) => {
   vingerTik();
   tik();
 });
+// Lang ingedrukt (bv. Android met een langere "aanraken en vasthouden"-vertraging): de click komt pas bij het
+// loslaten, ruim na het neerzetten. Ook die hoort nog bij deze tik.
+kaart.addEventListener("pointerup", vingerTik);
+kaart.addEventListener("pointercancel", vingerTik);
 kaart.addEventListener("click", (e) => { if (!isGhost() && !e.target.closest("#terug")) tik(); });
-opTik($("terug"), () => {
+function terug() {
   if (!kaart.classList.contains("on") || terugBezig) return; // history.back() is async: dubbeltik zou de app verlaten
   terugBezig = true;
   history.back();
-});
+}
+opTik($("terug"), terug);
 // Ook de terugknop van Android brengt je naar de categorieën. Na een herlaadbeurt op de kaart staat de
 // oude state er nog; die wissen we, anders doet de volgende terug-druk zichtbaar niets.
 if (history.state?.kaart) history.replaceState(null, "");
@@ -124,7 +134,7 @@ window.addEventListener("popstate", (e) => { if (!e.state?.kaart) naarHome(); })
 document.addEventListener("keydown", (e) => {
   if (!kaart.classList.contains("on") || e.repeat) return; // ingedrukt houden raast niet door de woorden
   if (e.target === $("terug") && (e.key === " " || e.key === "Enter")) return; // laat de knop zelf naar huis gaan
-  if (e.key === "Escape" || e.key === "Backspace") { e.preventDefault(); $("terug").click(); }
+  if (e.key === "Escape" || e.key === "Backspace") { e.preventDefault(); terug(); }
   else if ([" ", "Enter"].includes(e.key)) { e.preventDefault(); tik(); }
   else if (e.key === "ArrowRight") { e.preventDefault(); if (tikMag()) volgende(); }
 });
@@ -157,7 +167,8 @@ opTik(installeer, async () => {
     const p = installPrompt;
     installPrompt = null;
     installeer.hidden = true;
-    p.prompt();
+    // prompt() faalt als de gebruikersactie te lang geleden is (muis lang ingedrukt): dan de knop terug
+    p.prompt().catch(() => { installPrompt = p; installeer.hidden = false; });
     await p.userChoice.catch(() => {});
   } else if (iOS) {
     alert(inApp
