@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gegenereerd door scripts/android-assets.mjs, niet met de hand wijzigen. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp" android:height="36dp"
+    android:viewportWidth="36" android:viewportHeight="36">
+    <path android:fillColor="#BF6952" android:pathData="M29 34a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h18a2 2 0 0 1 2 2v32z" />
+    <path android:fillColor="#FFAC33" android:pathData="M9.5,18a1.5,1.5 0 1,0 3,0a1.5,1.5 0 1,0 -3,0z" />
+    <path android:fillColor="#AC5640" android:pathData="M25 3a1 1 0 0 0-1 1v9H11a1 1 0 0 0 0 2h14a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm0 25a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H11a1 1 0 0 1 0-2h13v-2a1 1 0 0 1 1-1z" />
+    <path android:fillColor="#854836" android:pathData="M11 33a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h14a1 1 0 0 1 0 2H12v2a1 1 0 0 1-1 1z" />
+    <path android:fillColor="#AC5640" android:pathData="M25 21a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H11a1 1 0 0 1 0-2h13v-2a1 1 0 0 1 1-1z" />
+    <path android:fillColor="#854836" android:pathData="M11 26a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h14a1 1 0 0 1 0 2H12v2a1 1 0 0 1-1 1zm0-11a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h14a1 1 0 0 1 0 2H12v9a1 1 0 0 1-1 1z" />
+</vector>

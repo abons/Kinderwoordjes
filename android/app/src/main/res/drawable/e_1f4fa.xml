@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gegenereerd door scripts/android-assets.mjs, niet met de hand wijzigen. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp" android:height="36dp"
+    android:viewportWidth="36" android:viewportHeight="36">
+    <path android:fillColor="#31373D" android:pathData="M35 31s0 4-4 4H5c-4 0-4-4-4-4V12c0-4 4-4 4-4h26s4 0 4 4v19z" />
+    <path android:fillColor="#31373D" android:pathData="M21.303 10.389a.999.999 0 1 1-1.414 1.414l-9.192-9.192a.999.999 0 1 1 1.414-1.414l9.192 9.192z" />
+    <path android:fillColor="#31373D" android:pathData="M14.697 10.389a.999.999 0 1 0 1.414 1.414l9.192-9.192a.999.999 0 1 0-1.414-1.414l-9.192 9.192z" />
+    <path android:fillColor="#55ACEE" android:pathData="M18 11c8 0 10 1 11 2s2 3 2 8-1 7-2 8-3 2-11 2-10-1-11-2-2-3-2-8 1-7 2-8 3-2 11-2z" />
+    <path android:fillColor="#66757F" android:pathData="M30,31.5a1.5,1.5 0 1,0 3,0a1.5,1.5 0 1,0 -3,0z" />
+    <path android:fillColor="#66757F" android:pathData="M3,31.5a1.5,1.5 0 1,0 3,0a1.5,1.5 0 1,0 -3,0z" />
+</vector>

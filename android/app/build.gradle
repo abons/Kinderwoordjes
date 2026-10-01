@@ -1,0 +1,87 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+// Ondertekenen van de release: uit local.properties (lokaal, gitignored, zoals de zusterapps) of uit
+// omgevingsvariabelen (GitHub Actions, uit de repo-secrets). Niets daarvan komt in git.
+def localProperties = new Properties()
+def localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    localPropsFile.withInputStream { localProperties.load(it) }
+}
+def instelling = { String naam -> localProperties.getProperty(naam) ?: System.getenv(naam) ?: "" }
+def releaseStoreFile = instelling("RELEASE_STORE_FILE")
+def hasReleaseSigning = !releaseStoreFile.isEmpty()
+
+// GitHub Actions telt per run op; lokaal is het 1.
+def versie = (System.getenv("VERSION_CODE") ?: "1").toInteger()
+
+android {
+    namespace 'com.hrbons.kinderwoordjes'
+    compileSdk 35
+
+    // Zelfde reden als in de zusterapps: anders verschillen twee builds van dezelfde bron in bytes.
+    dependenciesInfo {
+        includeInApk false
+        includeInBundle true
+    }
+
+    signingConfigs {
+        release {
+            if (hasReleaseSigning) {
+                storeFile rootProject.file(releaseStoreFile)
+                storePassword instelling("RELEASE_STORE_PASSWORD")
+                keyAlias instelling("RELEASE_KEY_ALIAS")
+                keyPassword instelling("RELEASE_KEY_PASSWORD")
+            }
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.hrbons.kinderwoordjes"
+        minSdk 21
+        targetSdk 35
+        versionCode versie
+        versionName "1.${versie}"
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Zonder eigen sleutel met de debugsleutel, zodat de APK in elk geval installeert.
+            signingConfig hasReleaseSigning ? signingConfigs.release : signingConfigs.debug
+            vcsInfo {
+                include false
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+// WoordenTest leest assets/woorden.json en res/drawable van schijf; Gradle ziet dat niet vanzelf, en zonder
+// deze regels blijft de test UP-TO-DATE na een woordenwijziging (dezelfde valkuil als in de zusterapps).
+tasks.withType(Test).configureEach {
+    inputs.dir("src/main/res").withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.dir("src/main/assets").withPathSensitivity(PathSensitivity.RELATIVE)
+}
+
+// Geen runtime-afhankelijkheden: alleen het Android-framework en de Kotlin-stdlib.
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    // org.json zit in het framework, maar is in een JVM-test een stub die "Stub!" gooit.
+    testImplementation 'org.json:json:20240303'
+}

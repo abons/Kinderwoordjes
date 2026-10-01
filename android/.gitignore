@@ -1,0 +1,12 @@
+*.iml
+.gradle/
+local.properties
+/.idea/
+/build
+/app/build
+/.kotlin/
+.DS_Store
+
+# Ondertekenen: nooit sleutels committen
+*.keystore
+*.jks
