@@ -47,43 +47,64 @@ function kiesStem() {
 }
 if (window.speechSynthesis) { kiesStem(); speechSynthesis.onvoiceschanged = kiesStem; }
 // spraakKapot: er is wel speechSynthesis, maar er komt niets uit (geen stemmen, fout). Dan gaat één tik verder,
-// anders kost elk woord een dode tik.
-let spraakKapot = false;
+// anders kost elk woord een dode tik. Pas na twee keer niets, en de eerste keer met ruim de tijd: een koude
+// stem (Google TTS, iOS-verbeterde stem) doet er soms langer dan 1,5 s over. Bij een nieuwe categorie weer proberen.
+let spraakKapot = false, warm = false, missers = 0, wacht = 0;
 const kanPraten = () => geluidAan && !!window.speechSynthesis && !geenNl && !spraakKapot;
-const stil = () => { if (window.speechSynthesis?.speaking || window.speechSynthesis?.pending) speechSynthesis.cancel(); };
+const stil = () => {
+  clearTimeout(wacht); // zelf afgebroken is geen mislukte spraak
+  if (window.speechSynthesis?.speaking || window.speechSynthesis?.pending) speechSynthesis.cancel();
+};
 function zeg(tekst) {
   if (!kanPraten()) return;
   stil(); // alleen als er iets loopt: speak() direct na een onnodige cancel() verliest op iOS/Android soms het woord
+  if (speechSynthesis.paused) speechSynthesis.resume(); // iOS blijft na de achtergrond soms op pauze hangen
   const u = new SpeechSynthesisUtterance(tekst);
   u.lang = "nl-NL"; u.rate = 0.8; u.pitch = 1.1;
   if (stem) u.voice = stem;
-  const wacht = setTimeout(() => { spraakKapot = true; }, 1500);
-  u.onstart = () => clearTimeout(wacht);
-  u.onerror = (e) => { clearTimeout(wacht); if (e.error !== "interrupted" && e.error !== "canceled") spraakKapot = true; };
+  const mis = () => { if (++missers >= 2) spraakKapot = true; };
+  wacht = setTimeout(mis, warm ? 1500 : 3000);
+  u.onstart = () => { clearTimeout(wacht); warm = true; missers = 0; };
+  u.onend = () => clearTimeout(wacht);
+  u.onerror = (e) => { clearTimeout(wacht); if (e.error !== "interrupted" && e.error !== "canceled") mis(); };
   speechSynthesis.speak(u);
 }
 
 const schud = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
-let huidig = null, rij = [], pos = 0, laatste = 0, terugBezig = false, gezegd = false;
-function toon() {
-  const [w, img] = rij[pos];
+// Plaatjes vooraf laden en decoderen, zodat plaatje en woord samen verschijnen in plaats van het nieuwe woord
+// onder het oude (of een leeg) plaatje.
+const geladen = new Map();
+function laad(img) {
+  if (!geladen.has(img)) { const i = new Image(); i.src = "img/" + img + ".svg"; geladen.set(img, i.decode().catch(() => {})); }
+  return geladen.get(img);
+}
+let huidig = null, rij = [], pos = 0, laatste = 0, terugBezig = false, gezegd = false, toonNr = 0;
+async function toon() {
+  const nr = ++toonNr, [w, img] = rij[pos];
+  gezegd = false;
+  await Promise.race([laad(img), new Promise((r) => setTimeout(r, 150))]); // traag toestel: niet te lang wachten
+  if (nr !== toonNr) return;
   plaatje.src = "img/" + img + ".svg";
   woord.textContent = w;
-  for (const el of [plaatje, woord]) { el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); }
-  gezegd = false;
+  animeer("pop");
+  laad(rij[(pos + 1) % rij.length][1]);
+}
+function animeer(naam) {
+  for (const el of [plaatje, woord]) { el.classList.remove("pop", "zeg"); void el.offsetWidth; el.classList.add(naam); }
 }
 // Wild tikken van kleine handjes niet laten doorrazen.
 function tikMag() {
   const nu = Date.now();
-  if (nu - laatste < 400) return false;
+  if (nu - laatste < 200) return false;
   laatste = nu;
   return true;
 }
 // Eerst kijken: de eerste tik zegt het woord, de tweede gaat verder. Zonder geluid gaat één tik verder.
 function tik() {
   if (!tikMag()) return;
-  if (kanPraten() && !gezegd) { gezegd = true; zeg(rij[pos][0]); }
+  // Wiebel bij het voorlezen: ook als het toestel op stil staat, ziet het kind dat de tik aankwam.
+  if (kanPraten() && !gezegd) { gezegd = true; animeer("zeg"); zeg(rij[pos][0]); }
   else volgende();
 }
 function volgende() {
@@ -101,6 +122,8 @@ function volgende() {
 function start(cat) {
   if (kaart.classList.contains("on")) return; // twee vingers op twee tegels: maar één keer pushState
   huidig = cat; rij = cat.opVolgorde ? cat.woorden : schud(cat.woorden); pos = 0; laatste = Date.now();
+  spraakKapot = false; missers = 0;
+  kaart.classList.remove("druk");
   home.classList.remove("on"); kaart.classList.add("on");
   bewaak(); // voor als er geen pointerdown/keydown was, bv. een schermlezer
   history.pushState({ kaart: true }, "");
@@ -114,13 +137,15 @@ function naarHome() {
 
 kaart.addEventListener("pointerdown", (e) => {
   if (!e.isPrimary || e.button !== 0 || e.target.closest("#terug")) return;
+  kaart.classList.add("druk"); // de kaart deukt al bij het neerzetten in, zodat een lange druk niet voelt als "doet niks"
   vingerTik();
   tik();
 });
 // Lang ingedrukt (bv. Android met een langere "aanraken en vasthouden"-vertraging): de click komt pas bij het
 // loslaten, ruim na het neerzetten. Ook die hoort nog bij deze tik.
-kaart.addEventListener("pointerup", vingerTik);
-kaart.addEventListener("pointercancel", vingerTik);
+const los = () => { vingerTik(); kaart.classList.remove("druk"); };
+kaart.addEventListener("pointerup", los);
+kaart.addEventListener("pointercancel", los);
 kaart.addEventListener("click", (e) => { if (!isGhost() && !e.target.closest("#terug")) tik(); });
 function terug() {
   if (!kaart.classList.contains("on") || terugBezig) return; // history.back() is async: dubbeltik zou de app verlaten
