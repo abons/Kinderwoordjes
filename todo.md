@@ -16,5 +16,3 @@ Alleen wat nog open is; de geschiedenis staat in git.
   <https://github.com/abons/Kinderwoordjes/releases/latest/download/kinderwoordjes.apk>.
 - [ ] Op een echte telefoon proberen, vooral het voorlezen met de Nederlandse stem (de emulators in
   CI hebben die niet) en de melding "Volledig scherm" die je de eerste keer wegtikt.
-- [ ] Opruimen: de oude branch `ci-schermafdrukken` (vervangen door `ci-schermafdrukken-api23/29/34`)
-  mag weg.
