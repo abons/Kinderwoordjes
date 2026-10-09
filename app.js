@@ -211,4 +211,16 @@ opTik(installeer, async () => {
   }
 });
 
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js", { updateViaCache: "none" });
+if ("serviceWorker" in navigator) {
+  // Een nieuwe versie neemt de pagina over (skipWaiting + claim): laad dan opnieuw, anders blijft de
+  // geopende app de oude woorden tonen tot de volgende start. Niet bij de allereerste installatie.
+  const had = !!navigator.serviceWorker.controller;
+  let herladen = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (had && !herladen) { herladen = true; location.reload(); }
+  });
+  navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then((reg) => {
+    // een geïnstalleerde app die op de achtergrond wacht, navigeert niet: zoek dan zelf naar updates
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) reg.update().catch(() => {}); });
+  }).catch(() => {});
+}
