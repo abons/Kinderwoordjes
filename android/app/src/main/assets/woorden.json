@@ -872,6 +872,126 @@
   ]
  },
  {
+  "naam": "Vormen",
+  "img": "e_1f537",
+  "kleur": "#9fa8da",
+  "opVolgorde": false,
+  "woorden": [
+   [
+    "cirkel",
+    "e_1f535"
+   ],
+   [
+    "vierkant",
+    "e_1f7e5"
+   ],
+   [
+    "driehoek",
+    "e_1f53a"
+   ],
+   [
+    "ster",
+    "e_2b50"
+   ],
+   [
+    "hart",
+    "e_2764"
+   ],
+   [
+    "ruit",
+    "e_1f537"
+   ]
+  ]
+ },
+ {
+  "naam": "Feest",
+  "img": "e_1f389",
+  "kleur": "#f48fb1",
+  "opVolgorde": false,
+  "woorden": [
+   [
+    "feest",
+    "e_1f389"
+   ],
+   [
+    "ballon",
+    "e_1f388"
+   ],
+   [
+    "cadeau",
+    "e_1f381"
+   ],
+   [
+    "taart",
+    "e_1f382"
+   ],
+   [
+    "kaarsje",
+    "e_1f56f"
+   ],
+   [
+    "confetti",
+    "e_1f38a"
+   ],
+   [
+    "muziek",
+    "e_1f3b5"
+   ],
+   [
+    "feesthoedje",
+    "e_1f973"
+   ]
+  ]
+ },
+ {
+  "naam": "Beroepen",
+  "img": "e_1f9d1_200d_1f692",
+  "kleur": "#ff8a65",
+  "opVolgorde": false,
+  "woorden": [
+   [
+    "brandweerman",
+    "e_1f9d1_200d_1f692"
+   ],
+   [
+    "agent",
+    "e_1f46e"
+   ],
+   [
+    "dokter",
+    "e_1f9d1_200d_2695_fe0f"
+   ],
+   [
+    "juf",
+    "e_1f9d1_200d_1f3eb"
+   ],
+   [
+    "kok",
+    "e_1f9d1_200d_1f373"
+   ],
+   [
+    "boer",
+    "e_1f9d1_200d_1f33e"
+   ],
+   [
+    "piloot",
+    "e_1f9d1_200d_2708_fe0f"
+   ],
+   [
+    "astronaut",
+    "e_1f9d1_200d_1f680"
+   ],
+   [
+    "schilder",
+    "e_1f9d1_200d_1f3a8"
+   ],
+   [
+    "bouwvakker",
+    "e_1f477"
+   ]
+  ]
+ },
+ {
   "naam": "Tellen",
   "img": "e_33_20e3",
   "kleur": "#90caf9",
