@@ -84,6 +84,12 @@ self.CATEGORIES = [
     ["feest", "1f389"], ["ballon", "1f388"], ["cadeau", "1f381"], ["taart", "1f382"], ["kaarsje", "1f56f"],
     ["confetti", "1f38a"], ["muziek", "1f3b5"], ["feesthoedje", "1f973"],
   ] },
+  { id: "beroepen", naam: "Beroepen", img: "1f9d1-200d-1f692", kleur: "#ff8a65", woorden: [
+    ["brandweerman", "1f9d1-200d-1f692"], ["agent", "1f46e"], ["dokter", "1f9d1-200d-2695-fe0f"],
+    ["juf", "1f9d1-200d-1f3eb"], ["kok", "1f9d1-200d-1f373"], ["boer", "1f9d1-200d-1f33e"],
+    ["piloot", "1f9d1-200d-2708-fe0f"], ["astronaut", "1f9d1-200d-1f680"], ["schilder", "1f9d1-200d-1f3a8"],
+    ["bouwvakker", "1f477"],
+  ] },
   // opVolgorde: niet schudden, zodat je kunt meetellen
   { id: "getallen", naam: "Tellen", img: "33-20e3", kleur: "#90caf9", opVolgorde: true, woorden: [
     ["één", "31-20e3"], ["twee", "32-20e3"], ["drie", "33-20e3"], ["vier", "34-20e3"], ["vijf", "35-20e3"],

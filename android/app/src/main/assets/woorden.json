@@ -944,6 +944,54 @@
   ]
  },
  {
+  "naam": "Beroepen",
+  "img": "e_1f9d1_200d_1f692",
+  "kleur": "#ff8a65",
+  "opVolgorde": false,
+  "woorden": [
+   [
+    "brandweerman",
+    "e_1f9d1_200d_1f692"
+   ],
+   [
+    "agent",
+    "e_1f46e"
+   ],
+   [
+    "dokter",
+    "e_1f9d1_200d_2695_fe0f"
+   ],
+   [
+    "juf",
+    "e_1f9d1_200d_1f3eb"
+   ],
+   [
+    "kok",
+    "e_1f9d1_200d_1f373"
+   ],
+   [
+    "boer",
+    "e_1f9d1_200d_1f33e"
+   ],
+   [
+    "piloot",
+    "e_1f9d1_200d_2708_fe0f"
+   ],
+   [
+    "astronaut",
+    "e_1f9d1_200d_1f680"
+   ],
+   [
+    "schilder",
+    "e_1f9d1_200d_1f3a8"
+   ],
+   [
+    "bouwvakker",
+    "e_1f477"
+   ]
+  ]
+ },
+ {
   "naam": "Tellen",
   "img": "e_33_20e3",
   "kleur": "#90caf9",
