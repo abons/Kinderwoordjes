@@ -16,3 +16,12 @@ Alleen wat nog open is; de geschiedenis staat in git.
   <https://github.com/abons/Kinderwoordjes/releases/latest/download/kinderwoordjes.apk>.
 - [ ] Op een echte telefoon proberen, vooral het voorlezen met de Nederlandse stem (de emulators in
   CI hebben die niet) en de melding "Volledig scherm" die je de eerste keer wegtikt.
+
+## Voorlezen
+
+- [ ] **Geluid viel een keer weg, web én Android tegelijk** (2026-10-11). Icoon stond op 🔊, woord
+  ging gewoon verder zonder stem. Opgelost door het toestel te herstarten en andere apps te sluiten,
+  dus vermoedelijk een vastgelopen spraakdienst en geen codefout (Android sinds 2026-10-01
+  ongewijzigd, web-merge `5e5df2d` raakt het voorlezen niet). Alleen oppakken als het terugkomt:
+  dan kijken of de apps zich kunnen herstellen (Android: `spraakKapot` → `startStem()` bij elke
+  tik i.p.v. per categorie; web: `resume()`-regel in `zeg()` verdacht).
